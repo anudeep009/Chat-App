@@ -15,10 +15,28 @@ export const NotificationsDropdown: React.FC = () => {
       content: 'Mike mentioned you in a chat',
       timestamp: new Date(Date.now() - 1000 * 60 * 30),
     },
+    {
+      id: 3,
+      type: 'mention',
+      content: 'Mike mentioned you in a chat',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    },
+    {
+      id: 4,
+      type: 'mention',
+      content: 'Mike mentioned you in a chat',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    },
+    {
+      id: 5,
+      type: 'mention',
+      content: 'Mike mentioned you in a chat',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    },  
   ];
 
   return (
-    <div className="absolute top-16 right-4 w-80 bg-[#1A2238] border border-[#354766] rounded-lg shadow-lg z-50">
+    <div className="absolute top-16 overflow-y-auto right-4 w-44 md:w-80 bg-[#1A2238] border border-[#354766] rounded-lg shadow-lg z-50">
       <div className="p-4 border-b border-[#354766]">
         <h3 className="text-[#E0E0E0] font-medium">Notifications</h3>
       </div>

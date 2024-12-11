@@ -45,18 +45,18 @@ export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
           <img
             src={chat.avatar}
             alt={chat.username}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-8 h-8 md:w-12 md:h-12 rounded-full object-cover"
           />
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
-              <h3 className="text-[#E0E0E0] font-medium truncate">
+              <h3 className="text-[#E0E0E0] text-xs md:text-lg font-medium truncate">
                 {chat.username}
               </h3>
               <span className="text-xs text-[#9E9E9E] whitespace-nowrap ml-2">
                 {formatDistanceToNow(chat.timestamp)}
               </span>
             </div>
-            <p className="text-sm text-[#9E9E9E] truncate">{chat.lastMessage}</p>
+            <p className="text-xs md:text-lg text-[#9E9E9E] truncate">{chat.lastMessage}</p>
           </div>
           {chat.unread > 0 && (
             <span className="bg-[#2979FF] text-white text-xs font-medium px-2 py-1 rounded-full shrink-0">

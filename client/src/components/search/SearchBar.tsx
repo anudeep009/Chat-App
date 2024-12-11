@@ -31,7 +31,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onClose }) => {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name or username"
+          placeholder="Search by username"
           className="w-full bg-[#354766] text-[#E0E0E0] placeholder-[#9E9E9E] pl-10 pr-10 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2979FF]"
         />
         {(query || onClose) && (

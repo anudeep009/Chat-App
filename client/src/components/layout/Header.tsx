@@ -35,7 +35,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         >
           <Menu size={20} />
         </button>
-        <h1 className="text-[#E0E0E0] text-xl font-bold">ChatApp</h1>
+        <h1 className="text-[#E0E0E0] hidden text-xl md:block font-bold">ChatApp</h1>
       </div>
 
       <div className="hidden md:block flex-1 max-w-xl mx-4">
@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       {showNotifications && <NotificationsDropdown />}
       {showProfile && <ProfileDropdown />}
       {showSearch && (
-        <div className="absolute top-16 left-0 right-0 p-4 bg-[#1A2238] border-b border-[#354766] md:hidden z-50">
+        <div className="absolute top-16 left-0 text-sm right-0 p-4 bg-[#1A2238] border-b border-[#354766] md:hidden z-50">
           <SearchBar onClose={() => setShowSearch(false)} />
         </div>
       )}

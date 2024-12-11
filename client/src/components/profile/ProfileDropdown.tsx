@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, User, LogOut } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 
 export const ProfileDropdown: React.FC = () => {
   return (
@@ -8,10 +8,6 @@ export const ProfileDropdown: React.FC = () => {
         <button className="w-full px-4 py-2 text-left text-[#E0E0E0] hover:bg-[#354766] flex items-center gap-2">
           <User size={16} />
           View Profile
-        </button>
-        <button className="w-full px-4 py-2 text-left text-[#E0E0E0] hover:bg-[#354766] flex items-center gap-2">
-          <Settings size={16} />
-          Settings
         </button>
         <button className="w-full px-4 py-2 text-left text-[#E0E0E0] hover:bg-[#354766] flex items-center gap-2">
           <LogOut size={16} />
