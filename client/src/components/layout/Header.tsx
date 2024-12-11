@@ -1,8 +1,8 @@
 import React from "react";
-import { Bell, Search, User, Menu } from "lucide-react";
+import { Bell, User, Menu } from "lucide-react";
 import { NotificationsDropdown } from "../notifications/NotificationsDropdown";
 import { ProfileDropdown } from "../profile/ProfileDropdown";
-import { SearchBar } from "../search/SearchBar";
+
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -11,7 +11,6 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [showProfile, setShowProfile] = React.useState(false);
-  const [showSearch, setShowSearch] = React.useState(false);
 
   const toggleDropdown = (type: "notifications" | "profile") => {
     if (type === "notifications") {
@@ -49,19 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           ChatApp
         </h1>
       </div>
-
-      <div className="hidden md:block flex-1 max-w-xl mx-4">
-        <SearchBar />
-      </div>
-
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => setShowSearch((prev) => !prev)}
-          className="p-2 text-[#9E9E9E] hover:text-[#E0E0E0] transition-colors md:hidden"
-          aria-label="Search"
-        >
-          <Search size={20} />
-        </button>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -87,11 +74,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
       {showNotifications && <NotificationsDropdown />}
       {showProfile && <ProfileDropdown />}
-      {showSearch && (
-        <div className="absolute top-16 left-0 text-sm right-0 p-4 bg-[#1A2238] border-b border-[#354766] md:hidden z-50">
-          <SearchBar onClose={() => setShowSearch(false)} />
-        </div>
-      )}
     </header>
   );
 };
