@@ -5,7 +5,10 @@ interface UserContextType {
     setUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>({
+    userLoggedIn: false,
+    setUserLoggedIn: () => {},
+});
 
 interface UserContextProviderProps {
     children: ReactNode;

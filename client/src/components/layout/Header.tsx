@@ -2,6 +2,9 @@ import React from "react";
 import { Bell, User, Menu } from "lucide-react";
 import { NotificationsDropdown } from "../notifications/NotificationsDropdown";
 import { ProfileDropdown } from "../profile/ProfileDropdown";
+import { UserContext  } from "../../context/UserContext"
+import { Link } from "react-router-dom";
+import { useContext } from "react";
 
 
 interface HeaderProps {
@@ -11,6 +14,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [showProfile, setShowProfile] = React.useState(false);
+  const userContext = useContext(UserContext)!;
+  const { userLoggedIn } = userContext;
 
   const toggleDropdown = (type: "notifications" | "profile") => {
     if (type === "notifications") {
@@ -44,9 +49,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         >
           <Menu size={20} />
         </button>
+        <Link to="/">
         <h1 className="text-[#E0E0E0] hidden text-xl md:block font-bold">
-          ChatApp
+            ChatApp
         </h1>
+        </Link>
       </div>
       <div className="flex items-center gap-2">
         <button
@@ -60,7 +67,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <Bell size={20} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-[#2979FF] rounded-full"></span>
         </button>
-        <button
+        {
+          userLoggedIn ? (
+            <button
           onClick={(e) => {
             e.stopPropagation();
             toggleDropdown("profile");
@@ -70,6 +79,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         >
           <User size={20} />
         </button>
+          ) : (
+          <button>
+            <Link to={"/signup"}>
+            <User size={20} className="text-white" />
+            </Link>
+          </button>
+          )
+        }
       </div>
 
       {showNotifications && <NotificationsDropdown />}

@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import Header from './Header';
+import { useState, useEffect } from 'react';
 import ChatList from '../chat/ChatList'
 import ChatWindow from '../chat/ChatWindow';
-import Footer from './Footer';
 
 function Layout() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
       if (window.innerWidth >= 768) {
@@ -23,7 +21,6 @@ function Layout() {
   return (
     <>
     <div className="h-screen flex flex-col bg-[#1A2238] text-[#E0E0E0]">
-      <Header onMenuClick={() => setShowSidebar(!showSidebar)} />
       <div className="flex-1 flex overflow-hidden relative">
         <aside
           className={`${
@@ -50,7 +47,6 @@ function Layout() {
         </main>
       </div>
     </div>
-      <Footer />
       </>
   );
 }

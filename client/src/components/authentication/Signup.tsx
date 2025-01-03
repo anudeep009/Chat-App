@@ -74,7 +74,7 @@ const Signup: React.FC = () => {
 
         if (response.status === 201) {
           setFormError(null);
-          navigate("/login");
+          navigate("/signin");
         }
       } catch (error: any) {
         console.error("Signup error:", error);
@@ -97,13 +97,13 @@ const Signup: React.FC = () => {
   );
 
   return (
-    <div className="bg-[#0b0c14] mt-[80px] min-h-[670px]">
+    <div className="bg-[#1A2238] min-h-[670px]">
       <div className="mx-auto max-w-[350px] space-y-6 p-4">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl text-white font-bold">Sign Up</h1>
           <p className="text-white">
             Already a User?{" "}
-            <Link to="/auth/login" className="text-white underline">
+            <Link to="/signin" className="text-white underline">
               Log In
             </Link>
           </p>

@@ -74,13 +74,13 @@ const Login: React.FC = () => {
   );
 
   return (
-    <div className="bg-[#0b0c14] mt-[80px] min-h-[670px]">
+    <div className="bg-[#1A2238] min-h-[670px]">
       <div className="mx-auto max-w-[350px] space-y-6 p-4">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl text-white font-bold">Sign In</h1>
           <p className="text-white">
             Not a User?{" "}
-            <Link to="/auth/signup" className="text-white underline">
+            <Link to="/signup" className="text-white underline">
               Sign Up
             </Link>
           </p>
