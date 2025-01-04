@@ -8,7 +8,7 @@ interface User extends Document {
 
 const UserSchema = new Schema({
     username: { type: String, required: true, unique: true, trim: true, minlength: 3, maxlength: 20 },
-    password: { type: String, required: true, trim: true, minlength: 6, maxlength: 20 },
+    password: { type: String, required: true, trim: true},
     profileImage : { type: String, default: '', trim: true },
 });
 

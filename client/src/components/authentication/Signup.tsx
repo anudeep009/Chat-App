@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "sonner"
 
 interface FormData {
   username: string;
@@ -52,15 +53,17 @@ const Signup: React.FC = () => {
 
         const imageUrl = imageUploadResponse.data.secure_url;
 
-        const response = await axios.post(`${import.meta.env.VITE_PRODUCTION_URL}/api/v1/signup`, {
+        const response = await axios.post(`${import.meta.env.VITE_PRODUCTION_URL}/api/auth/signup`, {
           username: formData.username,
           password: formData.password,
           profileImage: imageUrl,
         });
 
         if (response.status === 201) {
+          toast.success("Signup successful. Please login to continue.");
           setFormError(null);
           navigate("/signin");
+
         }
       } catch (error: any) {
         console.error("Signup error:", error);

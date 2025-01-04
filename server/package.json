@@ -2,11 +2,11 @@
   "name": "chatapp",
   "version": "1.0.0",
   "main": "server.ts",
- "scripts": {
+  "scripts": {
     "build": "tsc -b",
     "start": "node dist/server.js",
     "dev": "nodemon --watch --ext ts,json --exec \"ts-node server.ts\""
-},
+  },
   "author": "",
   "license": "ISC",
   "description": "",

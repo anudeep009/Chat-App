@@ -13,7 +13,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const hashedPassword = await bcrypt.hash(password, process.env.SALT_ROUNDS || 10);
+        const hashedPassword = await bcrypt.hash(password,10);
 
         const newUser = new User({
             username,
@@ -25,6 +25,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
 
         res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
@@ -32,6 +33,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
 const signin = async (req: Request, res: Response): Promise<void> => {
     try {
         const { username, password } = req.body;
+
         const user = await User.findOne({ username });
         if (!user) {
             res.status(400).json({ message: 'Invalid username or password' });
@@ -43,12 +45,22 @@ const signin = async (req: Request, res: Response): Promise<void> => {
             res.status(400).json({ message: 'Invalid username or password' });
             return;
         }
-        const token = jwt.sign({ username }, process.env.JWT_SECRET || 'anudeepavula', { expiresIn: '1h' });
-        res.send({ token,user });
-        res.status(200).json({ message: 'Signin successful' });
+
+        // Generate a JWT token
+        const token = jwt.sign(
+            { username }, 
+            process.env.JWT_SECRET || 'anudeepavula', 
+            { expiresIn: '1h' }
+        );
+
+        const { password: _, ...userWithoutPassword } = user.toObject();
+
+        res.status(200).json({ token, user: userWithoutPassword });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
 
 export { signup, signin };

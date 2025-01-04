@@ -1,9 +1,12 @@
 import axios from "axios";
 import React, { useState, useCallback, useMemo, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useContext } from "react";
+import { UserContext } from "../../context/UserContext";
 
 interface FormData {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -11,21 +14,18 @@ const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
-    email: "",
+    username: "",
     password: "",
   });
   const [formError, setFormError] = useState<string>("");
   const navigate = useNavigate();
+  const userContext = useContext(UserContext)!;
+  const { setUserLoggedIn, user } = userContext;
 
   const validateForm = useCallback((): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setFormError("Please enter a valid email address");
-      return false;
-    }
     setFormError("");
     return true;
-  }, [formData.email]);
+  }, [formData.username]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;
@@ -41,16 +41,22 @@ const Login: React.FC = () => {
 
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_PRODUCTION_URL}/api/auth/login`,
+          `${import.meta.env.VITE_PRODUCTION_URL}/api/auth/signin`,
           {
-            email: formData.email,
+            username: formData.username,
             password: formData.password,
           }
         );
 
         if (response.status === 200) {
           localStorage.setItem("token", response.data.token);
-          navigate("/profile");
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          toast.success("Sign-in successful!");
+          setUserLoggedIn(true);
+          user.username = response.data.user?.username;
+          user.profileImage = response.data.user?.profileImage;
+          user.id = response.data.user?._id;
+          navigate("/");
         }
       } catch (error: any) {
         console.error("Signin error:", error);
@@ -88,15 +94,15 @@ const Login: React.FC = () => {
         <form onSubmit={onSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-white block font-medium">
-                Email
+              <label htmlFor="username" className="text-white block font-medium">
+                Username
               </label>
               <input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
+                id="username"
+                type="username"
+                placeholder="Enter Username"
                 required
-                value={formData.email}
+                value={formData.username}
                 onChange={handleChange}
                 className="w-full px-3 py-2 text-black border border-gray-300 rounded"
               />

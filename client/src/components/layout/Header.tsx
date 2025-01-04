@@ -15,8 +15,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [showProfile, setShowProfile] = React.useState(false);
   const userContext = useContext(UserContext)!;
-  const { userLoggedIn } = userContext;
-
+  const { userLoggedIn,user } = userContext;
+  console.log(userLoggedIn);
+  console.log(user);
   const toggleDropdown = (type: "notifications" | "profile") => {
     if (type === "notifications") {
       setShowNotifications((prev) => !prev);
