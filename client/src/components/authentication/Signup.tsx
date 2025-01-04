@@ -4,7 +4,6 @@ import axios from "axios";
 
 interface FormData {
   username: string;
-  email: string;
   password: string;
 }
 
@@ -13,22 +12,11 @@ const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     username: "",
-    email: "",
     password: "",
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const navigate = useNavigate();
-
-  const validateForm = useCallback((): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setFormError("Please enter a valid email address");
-      return false;
-    }
-    setFormError(null);
-    return true;
-  }, [formData.email]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;
@@ -43,7 +31,6 @@ const Signup: React.FC = () => {
   const onSubmit = useCallback(
     async (e: FormEvent<HTMLFormElement>): Promise<void> => {
       e.preventDefault();
-      if (!validateForm()) return;
 
       setIsLoading(true);
 
@@ -67,7 +54,6 @@ const Signup: React.FC = () => {
 
         const response = await axios.post(`${import.meta.env.VITE_PRODUCTION_URL}/api/v1/signup`, {
           username: formData.username,
-          email: formData.email,
           password: formData.password,
           profileImage: imageUrl,
         });
@@ -85,7 +71,7 @@ const Signup: React.FC = () => {
         setIsLoading(false);
       }
     },
-    [formData, validateForm, navigate, profileImage]
+    [formData, navigate, profileImage]
   );
 
   const buttonClasses = useMemo(
@@ -125,18 +111,6 @@ const Signup: React.FC = () => {
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="email" className="block font-medium">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter Email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border text-black border-gray-300 rounded"
-              />
               {formError && <p className="text-red-500 text-sm">{formError}</p>}
             </div>
             <div className="space-y-2">
