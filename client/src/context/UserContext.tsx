@@ -1,24 +1,19 @@
 import React, { createContext, useState, ReactNode } from 'react';
 
+interface UserType {
+    username: string;
+    profileImage: string;
+    id: string;
+}
+
 interface UserContextType {
     userLoggedIn: boolean;
     setUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-    user : {
-        username: string;
-        profileImage: string;
-        id : string;
-    }
+    user: UserType;
+    setUser: React.Dispatch<React.SetStateAction<UserType>>;
 }
 
-const UserContext = createContext<UserContextType | undefined>({
-    userLoggedIn: false,
-    setUserLoggedIn: () => {},
-    user: {
-        username: "",
-        profileImage: "",
-        id: ""
-    }   
-});
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
 interface UserContextProviderProps {
     children: ReactNode;
@@ -26,9 +21,10 @@ interface UserContextProviderProps {
 
 function UserContextProvider({ children }: UserContextProviderProps) {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
+    const [user, setUser] = useState<UserType>({ username: "", profileImage: "", id: "" });
 
     return (
-        <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn, user: { username: "", profileImage: "", id: "" } }}>
+        <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn, user, setUser }}>
             {children}
         </UserContext.Provider>
     );
