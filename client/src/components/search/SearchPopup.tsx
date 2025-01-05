@@ -5,6 +5,7 @@ import { FiSearch } from "react-icons/fi";
 import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../loading/Spinner.tsx";
 
 const SearchPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,9 +13,11 @@ const SearchPopup = () => {
   const [results, setResults] = useState<
     { _id: string; username: string; profileImage: string }[]
   >([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (query: string) => {
     const token = localStorage.getItem("token");
@@ -24,9 +27,12 @@ const SearchPopup = () => {
       return;
     }
 
+    setLoading(true);
+    setError(null);
+
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/search`,
+        `${import.meta.env.VITE_PRODUCTION_URL || "http://localhost:5000"}/api/v1/search`,
         { username: query },
         {
           headers: {
@@ -37,9 +43,14 @@ const SearchPopup = () => {
       setResults(response.data || []);
     } catch (error: any) {
       console.error("Error during search:", error);
+      setError(
+        error?.response?.data?.message || "An error occurred during the search."
+      );
       toast.error(
         error?.response?.data?.message || "An error occurred during the search."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,7 +58,10 @@ const SearchPopup = () => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
-    debounceTimeout.current = setTimeout(() => handleSearch(query), 300);
+    debounceTimeout.current = setTimeout(() => {
+      if (query.trim()) handleSearch(query);
+      else setResults([]);
+    }, 300);
   };
 
   const openModal = () => setIsOpen(true);
@@ -56,6 +70,7 @@ const SearchPopup = () => {
     setIsOpen(false);
     setSearchQuery("");
     setResults([]);
+    setError(null);
   };
 
   useEffect(() => {
@@ -129,7 +144,11 @@ const SearchPopup = () => {
 
                   {/* Results */}
                   <div className="mt-4">
-                    {results.length > 0 ? (
+                    {loading ? (
+                      <Spinner />
+                    ) : error ? (
+                      <p className="text-sm text-red-500">{error}</p>
+                    ) : results.length > 0 ? (
                       <ul className="space-y-2">
                         {results.map((result) => (
                           <li
@@ -149,16 +168,12 @@ const SearchPopup = () => {
                           </li>
                         ))}
                       </ul>
-                    ) : (
-                      searchQuery && (
-                        <p className="text-sm text-gray-500">
-                          No results found for "{searchQuery}".
-                        </p>
-                      )
-                    )}
+                    ) : searchQuery.trim() ? (
+                      <p className="text-sm text-gray-500">
+                        No results found for "{searchQuery}".
+                      </p>
+                    ) : null}
                   </div>
-
-                  {/* Close Button */}
                   <button
                     onClick={closeModal}
                     className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"

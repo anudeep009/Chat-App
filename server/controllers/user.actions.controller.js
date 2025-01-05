@@ -11,7 +11,7 @@ const searchUser = async (req, res) => {
       return res.status(400).json({ message: "Username is required" });
     }
 
-    const user = await User.findOne({ username }).select(
+    const user = await User.find({ username }).select(
       "_id username profileImage"
     );
     if (user) {
