@@ -1,47 +1,90 @@
-import React, { useState } from "react";
-import { formatDistanceToNow } from "../../utils/dateUtils";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface ChatPreview {
   id: string;
   username: string;
-  avatar: string;
-  lastMessage: string;
-  timestamp: Date;
-  unread: number;
+  profileImage: string;
 }
 
 interface ChatListProps {
-  onChatSelect?: () => void;
+  onChatSelect?: (chatId: string) => void;
 }
 
 export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
-  const [search, setSearch] = useState(""); 
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
   const [filteredChats, setFilteredChats] = useState<ChatPreview[]>([]);
 
-const chats: ChatPreview[] = [
-    {
-      id: "1",
-      username: "Sarah Wilson",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      lastMessage: "Hey, are we still meeting today?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 5),
-      unread: 2,
-    },
-    {
-      id: "2",
-      username: "Mike Johnson",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-      lastMessage: "The project looks great! 👍",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      unread: 0,
-    },
-  ];
+  useEffect(() => {
+    const fetchChats = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/signup");
+        return;
+      }
 
-  const handleSearch = () => {
-    const filtered = chats.filter((chat) =>
-      chat.username.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredChats(filtered);
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/chats`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setFilteredChats(response.data);
+      } catch (error: any) {
+        console.error("Error fetching chats:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load chats. Please try again."
+        );
+      }
+    };
+
+    fetchChats();
+  }, [navigate]);
+
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search) {
+        handleSearch();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  const handleSearch = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/signup");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/search`,
+        { username: search },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      setFilteredChats(response.data);
+      console.log("filtered chats",filteredChats);
+    } catch (error: any) {
+      console.error("Error during search:", error);
+      toast.error(
+        error.response?.data?.message || "An error occurred during search."
+      );
+    }
   };
 
   return (
@@ -49,6 +92,7 @@ const chats: ChatPreview[] = [
       <div>
         <div className="relative md:w-[350px] w-[250px] m-4">
           <input
+            value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="search"
             className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-s-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
@@ -79,37 +123,28 @@ const chats: ChatPreview[] = [
           </button>
         </div>
       </div>
-      {(filteredChats.length > 0 ? filteredChats : chats).map((chat) => (
-        <div
-          key={chat.id}
-          className="flex items-center gap-3 p-4 hover:bg-[#354766] cursor-pointer transition-colors active:bg-[#2979FF] active:bg-opacity-20"
-          onClick={onChatSelect}
-        >
-          <img
-            src={chat.avatar}
-            alt={chat.username}
-            className="w-8 h-8 md:w-12 md:h-12 rounded-full object-cover"
-          />
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start">
+      {filteredChats.length > 0 ? (
+        filteredChats.map((chat) => (
+          <div
+            key={chat.id}
+            className="flex items-center gap-3 p-4 hover:bg-[#354766] cursor-pointer transition-colors active:bg-[#2979FF] active:bg-opacity-20"
+            onClick={() => onChatSelect?.(chat.id)}
+          >
+            <img
+              src={chat.profileImage}
+              alt={chat.username}
+              className="w-8 h-8 md:w-12 md:h-12 rounded-full object-cover"
+            />
+            <div className="flex-1 min-w-0">
               <h3 className="text-[#E0E0E0] text-xs md:text-lg font-medium truncate">
                 {chat.username}
               </h3>
-              <span className="text-xs text-[#9E9E9E] whitespace-nowrap ml-2">
-                {formatDistanceToNow(chat.timestamp)}
-              </span>
             </div>
-            <p className="text-xs md:text-lg text-[#9E9E9E] truncate">
-              {chat.lastMessage}
-            </p>
           </div>
-          {chat.unread > 0 && (
-            <span className="bg-[#2979FF] text-white text-xs font-medium px-2 py-1 rounded-full shrink-0">
-              {chat.unread}
-            </span>
-          )}
-        </div>
-      ))}
+        ))
+      ) : (
+        <p className="text-center text-gray-400 mt-4">No chats found.</p>
+      )}
     </div>
   );
 };

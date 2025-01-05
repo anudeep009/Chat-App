@@ -48,8 +48,8 @@ const signin = async (req, res) => {
         // Generate a JWT token
         const token = jwt.sign(
             { username }, 
-            process.env.JWT_SECRET || 'anudeepavula', 
-            { expiresIn: '1h' }
+            process.env.JWT_SECRET,
+            { expiresIn: '30d' }
         );
 
         const { password: _, ...userWithoutPassword } = user.toObject();

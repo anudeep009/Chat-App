@@ -4,6 +4,6 @@ import { searchUser } from "../controllers/user.actions.controller.js";
 
 const router = Router();
 
-router.post("/search",verifyJWT, searchUser);
+router.post("/search", verifyJWT, searchUser);
 
 export default router;
