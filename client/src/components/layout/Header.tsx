@@ -1,10 +1,11 @@
-import React from "react";
-import { Bell, User, Menu } from "lucide-react";
+import React, { useState } from "react";
+import { Bell, User, Menu, Search } from "lucide-react";
 import { NotificationsDropdown } from "../notifications/NotificationsDropdown";
 import { ProfileDropdown } from "../profile/ProfileDropdown";
 import { UserContext  } from "../../context/UserContext"
 import { Link } from "react-router-dom";
 import { useContext } from "react";
+import SearchPopup from "../search/SearchPopup";
 
 
 interface HeaderProps {
@@ -15,9 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [showProfile, setShowProfile] = React.useState(false);
   const userContext = useContext(UserContext)!;
-  const { userLoggedIn,user } = userContext;
-  console.log(userLoggedIn);
-  console.log(user);
+  const { userLoggedIn } = userContext;
   const toggleDropdown = (type: "notifications" | "profile") => {
     if (type === "notifications") {
       setShowNotifications((prev) => !prev);
@@ -57,6 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         </Link>
       </div>
       <div className="flex items-center gap-2">
+        <SearchPopup />
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -89,7 +89,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           )
         }
       </div>
-
       {showNotifications && <NotificationsDropdown />}
       {showProfile && <ProfileDropdown />}
     </header>
