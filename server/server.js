@@ -1,8 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
-import userRoutes from "./routes/auth.routes";
-import connectDB from "./db";
+import userRoutes from "./routes/auth.routes.js";
+import connectDB from "./db/index.js";
 import cors from "cors";
+import userActions from "./routes/user.actions.routes.js"
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -29,3 +30,5 @@ app.listen(PORT, () => {
 
 
 app.use("/api/auth",userRoutes);
+
+app.use("/api/v1",userActions);

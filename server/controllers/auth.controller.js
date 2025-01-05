@@ -1,9 +1,8 @@
-import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { User } from '../models/user.model';
+import { User } from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 
-const signup = async (req: Request, res: Response): Promise<void> => {
+const signup = async (req, res) => {
     try {
         const { username, password, profileImage } = req.body;
 
@@ -30,7 +29,7 @@ const signup = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const signin = async (req: Request, res: Response): Promise<void> => {
+const signin = async (req, res) => {
     try {
         const { username, password } = req.body;
 

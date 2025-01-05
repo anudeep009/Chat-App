@@ -4,6 +4,7 @@ interface UserType {
     username: string;
     profileImage: string;
     id: string;
+    token : string;
 }
 
 interface UserContextType {
@@ -21,7 +22,7 @@ interface UserContextProviderProps {
 
 function UserContextProvider({ children }: UserContextProviderProps) {
     const [userLoggedIn, setUserLoggedIn] = useState(false);
-    const [user, setUser] = useState<UserType>({ username: "", profileImage: "", id: "" });
+    const [user, setUser] = useState<UserType>({ username: "", profileImage: "", id: "", token : "" });
 
     return (
         <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn, user, setUser }}>
