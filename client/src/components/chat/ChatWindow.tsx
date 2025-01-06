@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Send } from 'lucide-react';
 import Message from './Message';
+import { UserContext } from '../../context/UserContext';
 
 export const ChatWindow: React.FC = () => {
   const [message, setMessage] = React.useState('');
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const usercontext = useContext(UserContext)!;
+  const { selectedChat } = usercontext;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -30,10 +33,10 @@ export const ChatWindow: React.FC = () => {
         >
           <img
             className="w-12 h-12 rounded-full object-cover cursor-pointer"
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+            src={selectedChat.profileImage}
           />
           <h3 className="text-[#E0E0E0] font-medium truncate">
-                Sarah Wilson
+                {selectedChat.username}
           </h3>
         </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

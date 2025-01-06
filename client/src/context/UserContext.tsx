@@ -7,11 +7,20 @@ interface UserType {
     token?: string;
 }
 
+interface SelectedChatType {
+    _id : string;
+    username: string;
+    profileImage: string;
+    chat: string[];
+}
+
 interface UserContextType {
     userLoggedIn: boolean;
     setUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
     user: UserType;
     setUser: React.Dispatch<React.SetStateAction<UserType>>;
+    selectedChat: SelectedChatType;
+    setSelectedChat: React.Dispatch<React.SetStateAction<SelectedChatType>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,7 +35,12 @@ function UserContextProvider({ children }: UserContextProviderProps) {
         username: "",
         profileImage: "",
         id: "",
-        token: undefined,
+    });
+    const [selectedChat, setSelectedChat] = useState<SelectedChatType>({
+        _id : "",
+        username: "",
+        profileImage: "",
+        chat: [],
     });
 
     useEffect(() => {
@@ -37,10 +51,10 @@ function UserContextProvider({ children }: UserContextProviderProps) {
             try {
                 const parsedUser = JSON.parse(storedUser);
                 setUser({
-                    username: parsedUser.username,
-                    profileImage: parsedUser.profileImage,
-                    id: parsedUser._id,
-                    token: token,
+                    username: parsedUser.username || "",
+                    profileImage: parsedUser.profileImage || "",
+                    id: parsedUser._id || "",
+                    token,
                 });
                 setUserLoggedIn(true);
             } catch (error) {
@@ -50,7 +64,16 @@ function UserContextProvider({ children }: UserContextProviderProps) {
     }, []);
 
     return (
-        <UserContext.Provider value={{ userLoggedIn, setUserLoggedIn, user, setUser }}>
+        <UserContext.Provider
+            value={{
+                userLoggedIn,
+                setUserLoggedIn,
+                user,
+                setUser,
+                selectedChat,
+                setSelectedChat,
+            }}
+        >
             {children}
         </UserContext.Provider>
     );

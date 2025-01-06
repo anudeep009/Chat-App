@@ -10,9 +10,9 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 const app = express();
 const origns = [
-  "http://localhost:5174",
-  "http://localhost:5174/api/auth/signup",
-  "http://localhost:5174/api/auth/signin",
+  "http://localhost:5173",
+  "http://localhost:5173/api/auth/signup",
+  "http://localhost:5173/api/auth/signin",
 ];
 app.use(
   cors({

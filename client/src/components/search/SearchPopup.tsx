@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { FiSearch } from "react-icons/fi";
@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../loading/Spinner.tsx";
+import { UserContext } from "../../context/UserContext.tsx";
 
 const SearchPopup = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,12 @@ const SearchPopup = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const usercontext = useContext(UserContext);
+  if (!usercontext) {
+    throw new Error("UserContext must be used within a UserContextProvider.");
+  }
+  const { setSelectedChat } = usercontext;
 
   const handleSearch = async (query: string) => {
     const token = localStorage.getItem("token");
@@ -43,12 +50,10 @@ const SearchPopup = () => {
       setResults(response.data || []);
     } catch (error: any) {
       console.error("Error during search:", error);
-      setError(
-        error?.response?.data?.message || "An error occurred during the search."
-      );
-      toast.error(
-        error?.response?.data?.message || "An error occurred during the search."
-      );
+      const errorMessage =
+        error?.response?.data?.message || "An error occurred during the search.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -80,6 +85,15 @@ const SearchPopup = () => {
       }
     };
   }, []);
+
+  const handleSelectedChat = (
+    username: string,
+    profileImage: string,
+    id: string
+  ) => {
+    setSelectedChat({ username, profileImage, chat: [], _id : id });
+    closeModal();
+  };
 
   return (
     <>
@@ -154,10 +168,13 @@ const SearchPopup = () => {
                           <li
                             key={result._id}
                             className="flex items-center gap-2 p-2 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 cursor-pointer"
-                            onClick={() => {
-                              alert(`You selected: ${result.username}`);
-                              closeModal();
-                            }}
+                            onClick={() =>
+                              handleSelectedChat(
+                                result.username,
+                                result.profileImage,
+                                result._id
+                              )
+                            }
                           >
                             <img
                               src={result.profileImage}
