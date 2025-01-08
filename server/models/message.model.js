@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const MessageSchema = new mongoose.Schema(
   {
     chatRoom: {
@@ -14,17 +16,6 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    messageType: {
-      type: String,
-      enum: ["text", "image", "video", "file"],
-      default: "text",
-    },
-    readBy: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
   },
   {
     timestamps: true,
