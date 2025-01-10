@@ -7,24 +7,46 @@ import axios from 'axios';
 export const ChatWindow: React.FC = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      content: "Hey! How are you?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 10),
-      sent: false,
-      status: "read",
-    },
-    {
-      content: "I'm doing great, thanks! How about you?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 5),
-      sent: true,
-      status: "delivered",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
+
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const usercontext = useContext(UserContext)!;
   const { selectedChat, user } = usercontext;
+
+  const fetchSelectedChat = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/getMessages`,
+        {
+          userId1: user.id,
+          userId2: selectedChat._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      console.log(response.data.messages); 
+
+      // Update the state with the fetched messages
+      setMessages(response.data.messages.map((msg: any) => ({
+        content: msg.content,
+        timestamp: new Date(msg.createdAt),
+        sent: msg.sender._id === user.id,
+        status: 'delivered',
+      })));
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedChat) {
+      fetchSelectedChat(); // Make sure the function is called properly
+    }
+  }, [selectedChat]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -88,13 +110,13 @@ export const ChatWindow: React.FC = () => {
         <h3 className="text-[#E0E0E0] font-medium truncate">{selectedChat.username}</h3>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, index) => (
+        {messages?.map((msg, index) => (
           <Message
             key={index}
             content={msg.content}
             timestamp={msg.timestamp}
             sent={msg.sent}
-            status={"delivered"}
+            status={msg.status}
           />
         ))}
         <div ref={messagesEndRef} />

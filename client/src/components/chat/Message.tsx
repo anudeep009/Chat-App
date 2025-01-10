@@ -6,7 +6,7 @@ interface MessageProps {
   content: string;
   timestamp: Date;
   sent: boolean;
-  status: 'sent' | 'delivered' | 'read';
+  status?: 'sent' | 'delivered' | 'read';
 }
 
 export const Message: React.FC<MessageProps> = ({ content, timestamp, sent, status }) => {

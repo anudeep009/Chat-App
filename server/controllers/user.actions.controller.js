@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import  ChatRoom  from "../models/chat.model.js";
-import Message from "../models/message.model.js"
+import Message from "../models/message.model.js";
+import mongoose from "mongoose";
 
 /**
  * Controller to search for a user by username.
@@ -26,7 +27,6 @@ const searchUser = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 /**
  * Controller to send message.
@@ -75,5 +75,38 @@ const sendMessage = async (req, res) => {
   }
 };
 
+/**
+ * Controller to send message.
+ */
+const getMessages = async (req, res) => {
+    const { userId1, userId2 } = req.body;
 
-export { searchUser, sendMessage };
+    try {
+        const chatRoom = await ChatRoom.findOne({
+            participants: { $all: [new mongoose.Types.ObjectId(userId1), new mongoose.Types.ObjectId(userId2)] },
+        }).populate('participants', 'username profileImage')
+          .populate('lastMessage');
+
+        if (!chatRoom) {
+            return res.status(404).json({ message: 'Chat room not found' });
+        }
+
+        const messages = await Message.find({
+            chatRoom: chatRoom._id,
+            sender: { $in: [new mongoose.Types.ObjectId(userId1), new mongoose.Types.ObjectId(userId2)] },
+        })
+            .populate('sender', 'username profileImage')
+            .sort({ createdAt: 1 }); 
+
+        return res.status(200).json({
+            messages,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+export { searchUser, sendMessage, getMessages };
