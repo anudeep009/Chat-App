@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { UserContext } from "../../context/UserContext";
 
 interface ChatPreview {
   id: string;
@@ -18,6 +19,19 @@ export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
   const navigate = useNavigate();
   const [filteredChats, setFilteredChats] = useState<ChatPreview[]>([]);
   const token = localStorage.getItem("token");
+  const usercontext = useContext(UserContext)!;
+  const { setSelectedChat } = usercontext;
+
+  const handleSelectedChat = (chat: ChatPreview) => {
+    setSelectedChat({
+      _id : chat.id,
+      username : chat.username,
+      profileImage : chat.profileImage
+    });
+    if (onChatSelect) {
+      onChatSelect(chat.id);
+    }
+  };
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -42,7 +56,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
             }
           );
           const chats = response.data.recentChats.map((chat: any) => ({
-            id: chat.chatRoomId,
+            id: chat?.lastMessage?.sender?._id,
             username: chat.participants[0]?.username,
             profileImage: chat.participants[0]?.profileImage,
             recentMessage: chat.lastMessage.content,
@@ -62,13 +76,12 @@ export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
 
   return (
     <div className="bg-[#1A2238] h-full overflow-y-auto">
-      <div></div>
       {filteredChats.length > 0 ? (
         filteredChats.map((chat) => (
           <div
             key={chat.id}
             className="flex items-center gap-3 p-4 hover:bg-[#354766] cursor-pointer transition-colors active:bg-[#2979FF] active:bg-opacity-20"
-            onClick={() => onChatSelect?.(chat.id)}
+            onClick={() => handleSelectedChat(chat)} 
           >
             <img
               src={chat.profileImage}

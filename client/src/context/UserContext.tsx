@@ -8,10 +8,10 @@ interface UserType {
 }
 
 interface SelectedChatType {
-    _id : string;
+    _id : string;  //user id not chat id
     username: string;
     profileImage: string;
-    chat: string[];
+    chat? : string[];
 }
 
 interface UserContextType {
