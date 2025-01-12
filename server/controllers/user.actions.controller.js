@@ -118,4 +118,50 @@ const getMessages = async (req, res) => {
   }
 };
 
-export { searchUser, sendMessage, getMessages };
+/**
+ * Controller to fetch recent chats.
+ */
+
+const getRecentChats = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // Find chat rooms where the user is a participant
+    const recentChatRooms = await ChatRoom.find({ participants: userId })
+      .populate({
+        path: "lastMessage",
+        select: "content sender createdAt",
+        populate: {
+          path: "sender",
+          select: "username profileImage",
+        },
+      })
+      .populate({
+        path: "participants",
+        select: "username profileImage",
+      })
+      .sort({ updatedAt: -1 });
+
+    const formattedChats = recentChatRooms.map((chatRoom) => {
+      const otherParticipants = chatRoom.participants.filter(
+        (participant) => participant._id.toString() !== userId
+      );
+
+      return {
+        chatRoomId: chatRoom._id,
+        isGroupChat: chatRoom.isGroupChat,
+        lastMessage: chatRoom.lastMessage || { content: "No messages yet" },
+        participants: otherParticipants,
+        updatedAt: chatRoom.updatedAt,
+      };
+    });
+
+    res.status(200).json({ recentChats: formattedChats });
+  } catch (error) {
+    console.error("Error fetching recent chats:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+export { searchUser, sendMessage, getMessages, getRecentChats };

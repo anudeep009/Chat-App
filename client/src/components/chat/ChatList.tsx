@@ -7,6 +7,7 @@ interface ChatPreview {
   id: string;
   username: string;
   profileImage: string;
+  recentMessage: string;
 }
 
 interface ChatListProps {
@@ -16,41 +17,52 @@ interface ChatListProps {
 export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
   const navigate = useNavigate();
   const [filteredChats, setFilteredChats] = useState<ChatPreview[]>([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchChats = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
         navigate("/signup");
         return;
       }
 
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/chats`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setFilteredChats(response.data);
-      } catch (error: any) {
-        console.error("Error fetching chats:", error);
-        toast.error(
-          error.response?.data?.message || "Failed to load chats. Please try again."
-        );
+      const user = localStorage.getItem("user");
+      if (user) {
+        let parsedUser = JSON.parse(user);
+        const userId = parsedUser._id;
+
+        try {
+          const response = await axios.post(
+            `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/recent-chats`,
+            { userId },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const chats = response.data.recentChats.map((chat: any) => ({
+            id: chat.chatRoomId,
+            username: chat.participants[0]?.username,
+            profileImage: chat.participants[0]?.profileImage,
+            recentMessage: chat.lastMessage.content,
+          }));
+          setFilteredChats(chats);
+        } catch (error: any) {
+          console.error("Error fetching chats:", error);
+          toast.error(
+            error.response?.data?.message || "Failed to load chats. Please try again."
+          );
+        }
       }
     };
 
     fetchChats();
-  }, [navigate]);
-
+  }, [navigate, token]);
 
   return (
     <div className="bg-[#1A2238] h-full overflow-y-auto">
-      <div>
-      </div>
+      <div></div>
       {filteredChats.length > 0 ? (
         filteredChats.map((chat) => (
           <div
@@ -67,6 +79,7 @@ export const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
               <h3 className="text-[#E0E0E0] text-xs md:text-lg font-medium truncate">
                 {chat.username}
               </h3>
+              <h5>{chat.recentMessage}</h5>
             </div>
           </div>
         ))

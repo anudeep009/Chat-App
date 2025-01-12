@@ -23,7 +23,7 @@ export const ChatWindow: React.FC = () => {
   const fetchSelectedChat = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/getMessages`,
+        `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/get-messages`,
         {
           userId1: user.id,
           userId2: selectedChat?._id,
