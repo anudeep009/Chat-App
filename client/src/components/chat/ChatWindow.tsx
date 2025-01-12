@@ -61,6 +61,9 @@ export const ChatWindow: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  /*
+  send message handler
+  */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -90,7 +93,7 @@ export const ChatWindow: React.FC = () => {
             content: res.data.newMessage.content,
             timestamp: new Date(res.data.newMessage.createdAt),
             sent: true,
-            status: 'delivered',
+            status:'delivered',
           },
         ]);
         setMessage(null);
@@ -120,11 +123,11 @@ export const ChatWindow: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((msg, index) => (
           <Message
-            key={index}
-            content={msg.content}
-            timestamp={msg.timestamp}
-            sent={msg.sent}
-            status={"delivered"}
+          key={index}
+          content={msg.content}
+          timestamp={msg.timestamp}
+          sent={msg.sent}
+          status={"delivered"}
           />
         ))}
         <div ref={messagesEndRef} />
