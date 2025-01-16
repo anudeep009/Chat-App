@@ -6,7 +6,7 @@ import cors from "cors";
 import userActions from "./routes/user.actions.routes.js";
 
 dotenv.config();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 connectDB();
 const app = express();
 const origns = [

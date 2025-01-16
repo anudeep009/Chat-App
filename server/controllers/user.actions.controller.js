@@ -9,6 +9,11 @@ import mongoose from "mongoose";
 const searchUser = async (req, res) => {
   try {
     const { username } = req.body;
+    const userId = req.user.username;
+
+    if (username == userId) {
+      return res.status(404).json({ message: "user not found" });
+    }
 
     if (!username) {
       return res.status(400).json({ message: "Username is required" });
@@ -17,6 +22,7 @@ const searchUser = async (req, res) => {
     const user = await User.find({ username }).select(
       "_id username profileImage"
     );
+
     if (user) {
       return res.status(200).json(user);
     } else {

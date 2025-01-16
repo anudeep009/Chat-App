@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 
 export interface Message {
   content: string;
-  timestamp: Date;
+  timestamp?: Date;
   sent: boolean;
   status: string;
 }
 
 export const ChatWindow: React.FC = () => {
-  const [message, setMessage] = useState<Message | null>(null);
+  const [messageContent, setMessageContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -21,6 +21,7 @@ export const ChatWindow: React.FC = () => {
   const usercontext = useContext(UserContext)!;
   const { selectedChat, user } = usercontext;
 
+  // Fetch messages for the selected chat
   const fetchSelectedChat = async () => {
     if (!selectedChat) return;
 
@@ -51,27 +52,29 @@ export const ChatWindow: React.FC = () => {
     }
   };
 
+  // Scroll to the bottom of the chat
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Fetch messages when the selected chat changes
   useEffect(() => {
     if (selectedChat) {
+      setMessageContent(''); // Clear input field
       fetchSelectedChat();
     }
   }, [selectedChat]);
 
+  // Scroll to the bottom when new messages are added
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  /*
-  Send message handler
-  */
+  // Handle sending a new message
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!message?.content.trim()) return;
+    if (!messageContent.trim()) return;
 
     setLoading(true);
     const token = localStorage.getItem('token');
@@ -82,7 +85,7 @@ export const ChatWindow: React.FC = () => {
         {
           toUserid: selectedChat?._id,
           fromUserid: user.id,
-          message: message.content,
+          message: messageContent,
         },
         {
           headers: {
@@ -100,7 +103,7 @@ export const ChatWindow: React.FC = () => {
             status: 'delivered',
           },
         ]);
-        setMessage(null);
+        setMessageContent(''); // Clear input field
         scrollToBottom();
       }
     } catch (error) {
@@ -115,7 +118,7 @@ export const ChatWindow: React.FC = () => {
     <div className="flex flex-col h-full bg-[#1A2238]">
       {/* Chat Header */}
       <div className="flex items-center gap-3 border-b border-[#354766] p-4">
-        {selectedChat && selectedChat.profileImage && selectedChat.username ? (
+        {selectedChat?.profileImage && selectedChat?.username ? (
           <>
             <img
               className="w-12 h-12 rounded-full object-cover cursor-pointer"
@@ -127,7 +130,7 @@ export const ChatWindow: React.FC = () => {
             </h3>
           </>
         ) : (
-          <h1 className="text-xs md:text-lg">
+          <h1 className="text-xs md:text-lg text-[#9E9E9E]">
             Select a chat and start messaging
           </h1>
         )}
@@ -139,9 +142,9 @@ export const ChatWindow: React.FC = () => {
           <Message
             key={index}
             content={msg.content}
-            timestamp={new Date(msg.timestamp)}
+            timestamp={new Date(msg?.timestamp)}
             sent={msg.sent}
-            status={"delivered"}
+            status="delivered"
           />
         ))}
         <div ref={messagesEndRef} />
@@ -150,20 +153,12 @@ export const ChatWindow: React.FC = () => {
       {/* Message Input */}
       <form onSubmit={handleSubmit} className="border-t border-[#354766] p-4">
         <div className="flex items-center gap-2">
-          {selectedChat.username ? (
+          {selectedChat?.username ? (
             <>
               <input
                 type="text"
-                value={message?.content || ''}
-                onChange={(e) =>
-                  setMessage((prev) => ({
-                    ...prev,
-                    content: e.target.value,
-                    timestamp: new Date(),
-                    sent: true,
-                    status: 'draft',
-                  }))
-                }
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
                 placeholder="Type a message..."
                 aria-label="Type your message"
                 className="flex-1 md:p-3 bg-[#354766] text-[#E0E0E0] placeholder-[#9E9E9E] px-1 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2979FF]"
@@ -173,7 +168,7 @@ export const ChatWindow: React.FC = () => {
                 type="submit"
                 aria-label="Send message"
                 className="p-1 text-[#2979FF] hover:text-[#E0E0E0] cursor-pointer transition-colors disabled:opacity-50 disabled:hover:text-[#2979FF]"
-                disabled={loading || !(message?.content.trim())}
+                disabled={loading || !messageContent.trim()}
               >
                 <Send size={20} />
               </button>
