@@ -38,29 +38,33 @@ export const ChatWindow: React.FC = () => {
           },
         }
       );
-      setMessages(
+      if(response.data?.messages.length > 0){
+        setMessages(
         response.data.messages.map((msg: any) => ({
           content: msg.content,
           timestamp: new Date(msg.createdAt),
           sent: msg.sender._id === user.id,
           status: 'delivered',
         }))
-      );
+      )
+      } else {
+        toast.warning("start messaging the user");
+      }
+      console.log("inside fetchslectd chat",response.data);
     } catch (error) {
       toast.error('Failed to fetch messages. Please try again.');
       console.error('Error fetching messages:', error);
     }
   };
 
-  // Scroll to the bottom of the chat
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Fetch messages when the selected chat changes
+
   useEffect(() => {
     if (selectedChat) {
-      setMessageContent(''); // Clear input field
+      setMessageContent('');
       fetchSelectedChat();
     }
   }, [selectedChat]);
@@ -70,7 +74,6 @@ export const ChatWindow: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Handle sending a new message
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
