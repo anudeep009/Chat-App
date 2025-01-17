@@ -12,21 +12,23 @@ export interface Message {
   status: string;
 }
 
-export const ChatWindow: React.FC = () => {
+const ChatWindow: React.FC = () => {
   const [messageContent, setMessageContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const usercontext = useContext(UserContext)!;
-  const { selectedChat, user } = usercontext;
 
-  // Fetch messages for the selected chat
+  const { selectedChat, user } = useContext(UserContext)!;
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const fetchSelectedChat = async () => {
     if (!selectedChat) return;
 
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/get-messages`,
         {
           userId1: user.id,
@@ -38,29 +40,25 @@ export const ChatWindow: React.FC = () => {
           },
         }
       );
-      if(response.data?.messages.length > 0){
+
+      const fetchedMessages = data?.messages || [];
+      if (fetchedMessages.length > 0) {
         setMessages(
-        response.data.messages.map((msg: any) => ({
-          content: msg.content,
-          timestamp: new Date(msg.createdAt),
-          sent: msg.sender._id === user.id,
-          status: 'delivered',
-        }))
-      )
+          fetchedMessages.map((msg: any) => ({
+            content: msg.content,
+            timestamp: new Date(msg.createdAt),
+            sent: msg.sender._id === user.id,
+            status: 'delivered',
+          }))
+        );
       } else {
-        toast.warning("start messaging the user");
+        toast.warning('Start messaging the user.');
       }
-      console.log("inside fetchslectd chat",response.data);
-    } catch (error) {
-      toast.error('Failed to fetch messages. Please try again.');
-      console.error('Error fetching messages:', error);
+    } catch (error : any) {
+      toast.error(error?.response?.data?.message || 'Failed to fetch messages. Please try again.');
+      console.error(error?.response?.data?.message);
     }
   };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
 
   useEffect(() => {
     if (selectedChat) {
@@ -69,7 +67,6 @@ export const ChatWindow: React.FC = () => {
     }
   }, [selectedChat]);
 
-  // Scroll to the bottom when new messages are added
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -83,7 +80,7 @@ export const ChatWindow: React.FC = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await axios.post(
+      const { data } = await axios.post(
         `${import.meta.env.VITE_PRODUCTION_URL}/api/v1/send-message`,
         {
           toUserid: selectedChat?._id,
@@ -96,22 +93,21 @@ export const ChatWindow: React.FC = () => {
           },
         }
       );
-      if (res.status === 201) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            content: res.data.newMessage.content,
-            timestamp: new Date(res.data.newMessage.createdAt),
-            sent: true,
-            status: 'delivered',
-          },
-        ]);
-        setMessageContent(''); // Clear input field
-        scrollToBottom();
-      }
-    } catch (error) {
-      toast.error('Failed to send the message. Please try again.');
-      console.error('Error sending message:', error);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          content: data.newMessage.content,
+          timestamp: new Date(data.newMessage.createdAt),
+          sent: true,
+          status: 'delivered',
+        },
+      ]);
+      setMessageContent('');
+      scrollToBottom();
+    } catch (error : any) {
+      toast.error(error?.response?.data?.message || 'Failed to send the message. Please try again.');
+      console.error(error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -124,7 +120,7 @@ export const ChatWindow: React.FC = () => {
         {selectedChat?.profileImage && selectedChat?.username ? (
           <>
             <img
-              className="w-12 h-12 rounded-full object-cover cursor-pointer"
+              className="w-12 h-12 rounded-full object-cover"
               src={selectedChat.profileImage}
               alt={selectedChat.username}
             />
@@ -145,9 +141,9 @@ export const ChatWindow: React.FC = () => {
           <Message
             key={index}
             content={msg.content}
-            timestamp={new Date(msg?.timestamp)}
+            timestamp={msg.timestamp}
             sent={msg.sent}
-            status="delivered"
+            status={msg.status}
           />
         ))}
         <div ref={messagesEndRef} />
@@ -163,14 +159,12 @@ export const ChatWindow: React.FC = () => {
                 value={messageContent}
                 onChange={(e) => setMessageContent(e.target.value)}
                 placeholder="Type a message..."
-                aria-label="Type your message"
                 className="flex-1 md:p-3 bg-[#354766] text-[#E0E0E0] placeholder-[#9E9E9E] px-1 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2979FF]"
                 disabled={loading}
               />
               <button
                 type="submit"
-                aria-label="Send message"
-                className="p-1 text-[#2979FF] hover:text-[#E0E0E0] cursor-pointer transition-colors disabled:opacity-50 disabled:hover:text-[#2979FF]"
+                className="p-1 text-[#2979FF] hover:text-[#E0E0E0] disabled:opacity-50"
                 disabled={loading || !messageContent.trim()}
               >
                 <Send size={20} />
