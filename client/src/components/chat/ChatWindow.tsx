@@ -141,9 +141,9 @@ const ChatWindow: React.FC = () => {
           <Message
             key={index}
             content={msg.content}
-            timestamp={msg.timestamp}
+            timestamp={msg.timestamp || new Date}
             sent={msg.sent}
-            status={msg.status}
+            status={'delivered'}
           />
         ))}
         <div ref={messagesEndRef} />
